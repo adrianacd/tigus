@@ -1,28 +1,48 @@
- <project name="tigus" default="build">  
- 	
+<project name="tigus" default="build">  
 
- 	<path id="common.classpath">
- 			<pathelement location="../common/bin" />
- 			<pathelement location="../common/lib/xstream-1.3.jar" />
-			<pathelement location="../conversion/bin" />
-    </path>
-	<property name="src" value="src"/>
-	<property name="bin" value="bin"/>
- 	
-	<target name="init"> 
-	    <mkdir dir="${bin}"/>
-	</target>
+<path id="common.classpath">
+	<pathelement location="../common/bin" />
+	<pathelement location="../common/lib/xstream-1.3.jar" />
+	<pathelement location="../conversion/bin" />
+</path>
 
-	<target name="build" depends="init"> 
-	     <javac srcdir="${src}" destdir="${bin}">
-		 	<classpath refid="common.classpath" />
-	     </javac>
-	</target>
-		
-	<target name="Clean" description="Removes previous build">
-	  <delete verbose="true">
+<property name="src" value="src"/>
+<property name="bin" value="bin"/>
+<property name="file.jar" value="app-editor.jar"/>
+	
+<target name="init"> 
+	<mkdir dir="${bin}"/>
+</target>
+
+<target name="build" depends="init">
+	<javac srcdir="${src}" destdir="${bin}">
+		<classpath refid="common.classpath" />
+	</javac>
+  </target>
+	
+<target name="make-jar" depends="build">
+	<jar jarfile="${file.jar}">	
+		<fileset dir="${bin}" />
+		<fileset dir="../common/bin" />		
+		<fileset dir="../conversion/bin" />
+		<manifest>
+     			<attribute name="Main-Class" value="org.tigus.app.editor.QuestionEditor"/>
+			<attribute name="Class-Path" value="../common/lib/xstream-1.3.jar"/>
+		</manifest>
+	</jar>
+	
+</target>
+
+<target name="clean" description="Removes previous build">
+  <delete verbose="true">
 	    <fileset dir="${bin}"/>
-	  </delete>
-	</target>
+  </delete>
+</target>
  	
+<target name="all">
+	<antcall target="clean" />
+	<antcall target="build" />
+	<antcall target="make-jar" />
+</target>
+
 </project>
