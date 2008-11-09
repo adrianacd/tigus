@@ -81,6 +81,7 @@ public class QuestionTab {
  
     
     public QuestionTab(String op, QuestionSetTab qsTab, JTabbedPane pane, Question question) {
+       
         this.qsTab = qsTab;
         this.tabbedPane = pane;   
         this.question = question;
@@ -362,7 +363,7 @@ public class QuestionTab {
                 }
                 state = "EDIT";                
                 
-                System.out.println("index : " + listIndex);
+              //  System.out.println("index : " + listIndex);
                 String answerText = answers.elementAt(listIndex).getText();
                 
                 // sets the component's content
@@ -453,8 +454,7 @@ public class QuestionTab {
                if (isCorrect && correctCount > 1){
                    JOptionPane.showMessageDialog(mainPanel,
                            "There must be only ONE correct answer!", 
-                               "Error", JOptionPane.ERROR_MESSAGE);    
-                   System.out.println("aici la isCorrect == true si correctCount > 1");
+                               "Error", JOptionPane.ERROR_MESSAGE);                 
                    correctCount--;
                    return;
                }

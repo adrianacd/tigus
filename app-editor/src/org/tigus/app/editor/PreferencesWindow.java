@@ -29,10 +29,13 @@ public class PreferencesWindow extends JFrame{
     DefaultListModel listModel;
     
     int index = -1;
-
+  
+    
     PreferencesWindow(QuestionSetTab qsTab){
+      
+        super("Preferences");  
+        setVisible(true);
         
-        super("Preferences");
         this.qsTab = qsTab;
         initComponents();
         setSize(400,500);

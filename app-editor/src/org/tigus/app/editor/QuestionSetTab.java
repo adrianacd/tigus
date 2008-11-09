@@ -105,7 +105,7 @@ public class QuestionSetTab implements ActionListener{
         if (op.equals("EDIT")) {
             
             int index = questions.indexOf(question);
-            System.out.println("la EDIT index = " + index);
+           // System.out.println("la EDIT index = " + index);
             questions.setElementAt(question, index);
             
             JPanel panel = createQuestionPanel(question);          
@@ -121,7 +121,7 @@ public class QuestionSetTab implements ActionListener{
             questions.removeElementAt(index);
             questionPanels. removeElementAt(index);
            
-            System.out.println("listModel.indexOf(question) = " + index);
+       //     System.out.println("listModel.indexOf(question) = " + index);
             listModel.removeElementAt(index);
             
             if(questions.size() == 0) {
@@ -137,7 +137,7 @@ public class QuestionSetTab implements ActionListener{
     
     public void enablePopupMenu(Boolean b) {      
         if(!hasPopup && b) {
-            System.out.println("enable");
+          //  System.out.println("enable");
             initPopupMenu();
             filterTextField.add(popupMenu);
             filterTextField.addMouseListener(new MouseAdapter() {          
@@ -226,7 +226,7 @@ public class QuestionSetTab implements ActionListener{
         }
         answersText += "</ul></html>>";
         
-        System.out.println("answers:" + answersText);  
+     //   System.out.println("answers:" + answersText);  
         
        
         /* create question's panel  */
@@ -248,7 +248,7 @@ public class QuestionSetTab implements ActionListener{
         /* create panels for each question  */
         
         int qsSize = questionSet.size();
-        System.out.println("question set size:" + qsSize);
+    //    System.out.println("question set size:" + qsSize);
   
         int i = 0;    
         
@@ -271,7 +271,7 @@ public class QuestionSetTab implements ActionListener{
      * Builds a html string containing a question's tags and their values, and
      * creates a hashmap object with tag's name+value as key, and the question as it's value
      * @param tagSet - the question's set of tags
-     * @return String object represintg tags and their values
+     * @return String object representing tags and their values
      */
     private String showTags(Question question) {
         
@@ -485,7 +485,7 @@ public class QuestionSetTab implements ActionListener{
      */
     private void addListeners() {
         addButton.addActionListener(new ActionListener(){
-            public void actionPerformed(ActionEvent e)  {
+            public void actionPerformed(ActionEvent e)  {             
                 createQuestion();
             }
         });
@@ -573,7 +573,7 @@ public class QuestionSetTab implements ActionListener{
      */
     private void createQuestion() {
         
-        try{      
+        try{   
             /*
               The application's user can not create new questions unless 
               she/he sets the author's name in "preferences" menu
@@ -581,13 +581,21 @@ public class QuestionSetTab implements ActionListener{
             String author = getAuthor();
             
             if (author.length() == 0) {
+                
+                JOptionPane.showMessageDialog(mainPanel,
+                        "Yout can not create questions until you fill " +
+                        "in your author name in Tools->Preferences", 
+                            "error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            Question question = new Question();
-            @SuppressWarnings("unused")
+            Question question = new Question(); 
+        
+            @SuppressWarnings("unused")           
             QuestionTab qt = new QuestionTab("NewQ", this, tabbedPane, question);
         
-         }catch (Exception e){}
+         }catch (Exception e){ 
+             e.printStackTrace();
+         }
     }
     
     /**
@@ -631,8 +639,17 @@ public class QuestionSetTab implements ActionListener{
         /*   
             The appplication's user can not review his/her question 
          */
-        System.out.println("Autor:" + getAuthor());
-        if(getAuthorTagValue(question).equals(getAuthor())) {
+    //    System.out.println("Autor:" + getAuthor());
+        String author = getAuthor();
+        if(author.length() == 0) {
+            JOptionPane.showMessageDialog(mainPanel,
+                    "Yout can not review questions until you fill " +
+                    "in your author name in Tools->Preferences", 
+                        "error", JOptionPane.ERROR_MESSAGE);
+            return;        
+        }
+        
+        if(getAuthorTagValue(question).equals(author)) {
            JOptionPane.showMessageDialog(mainPanel,
                    "You can not review your question!", 
                        "error", JOptionPane.ERROR_MESSAGE);
@@ -660,7 +677,7 @@ public class QuestionSetTab implements ActionListener{
    
         if(!getAuthorTagValue(question).equals(getAuthor())) {
            JOptionPane.showMessageDialog(mainPanel,
-                   "You can edit only your questions!", 
+                   "You can delete only your questions!", 
                        "error", JOptionPane.ERROR_MESSAGE);
            
            return;
@@ -676,10 +693,10 @@ public class QuestionSetTab implements ActionListener{
         Question question = questions.elementAt(index);
         Vector <Review> reviews = (Vector<Review>)question.getReviews();
         if(reviews.size() > 0) {
-            System.out.println("Review:");
-            System.out.println(reviews.elementAt(0).getAuthor());
-            System.out.println(reviews.elementAt(0).getDate());
-            System.out.println(reviews.elementAt(0).getComment());
+        //    System.out.println("Review:");
+        //    System.out.println(reviews.elementAt(0).getAuthor());
+        //    System.out.println(reviews.elementAt(0).getDate());
+        //    System.out.println(reviews.elementAt(0).getComment());
             
             @SuppressWarnings("unused")
             ReviewsTab rTab = new ReviewsTab(question, tabbedPane);
@@ -694,7 +711,7 @@ public class QuestionSetTab implements ActionListener{
      */
     private void filterQuestions() {
         String type = (String)typeComboBox.getSelectedItem();
-        System.out.println("type = " + type);
+       // System.out.println("type = " + type);
         String text = filterTextField.getText();
         
         if(text.length() == 0) {
@@ -703,7 +720,7 @@ public class QuestionSetTab implements ActionListener{
         if(type.equals(filterCriterias[2])) { // Tag and Values 
             String tag = (String)tagsComboBox.getSelectedItem();
             if(tag.length() == 0) return;
-            System.out.println("tag = " + tag);
+         //   System.out.println("tag = " + tag);
             filterTags(tag, text);
             
         }
@@ -789,7 +806,7 @@ class ListTransferHandler extends TransferHandler{
      
     public boolean canImport(TransferHandler.TransferSupport support) {
     
-        System.out.println("aici in canImport");
+     //   System.out.println("aici in canImport");
         if (!support.isDrop()) {
             return false;
         }
@@ -798,7 +815,7 @@ class ListTransferHandler extends TransferHandler{
     }
     
     public boolean importData(TransferHandler.TransferSupport info) {
-        System.out.println("aici in importData");
+      //  System.out.println("aici in importData");
         if (!info.isDrop()) {
             return false;
         }
@@ -812,7 +829,7 @@ class ListTransferHandler extends TransferHandler{
             return false;
         }
         
-        System.out.println(data);
+      //  System.out.println(data);
         QuestionSet newQS = QuestionSet.createFromXML(data);
 
         QuestionSet oldQS = qsTab.getQuestionSet();
@@ -827,7 +844,7 @@ class ListTransferHandler extends TransferHandler{
     }
     
     public int getSourceActions(JComponent comp) {
-        System.out.println("aici in getSourceActions");
+      //  System.out.println("aici in getSourceActions");
         return COPY_OR_MOVE;
     }
     
@@ -841,24 +858,24 @@ class ListTransferHandler extends TransferHandler{
         QuestionSet newQS = new QuestionSet();
         newQS.add(q);
         String data = newQS.toXML();
-        System.out.println("aici in createTransferable");
+       // System.out.println("aici in createTransferable");
    
         return new StringSelection(data);
     }
     
     public void exportDone(JComponent comp, Transferable trans, int action) {
-        System.out.println("aici in exportDone");
+      //  System.out.println("aici in exportDone");
         if (action != MOVE) {
             return;
         }
-        System.out.println("aici in exportDone");
+      //  System.out.println("aici in exportDone");
         qsTab.updateQuestionsList("DEL", q);
     }
     
     
 }
-/*To Do : mircea@bardac.net: mda... cred ca se poate verifica daca sursa e aceeasi cu destinatia
-mircea@bardac.net: si se poate ignora drag and drop-ul*/
+/*TODO : sa se  verifice daca sursa e aceeasi cu destinatia 
+ * si se poate ignora drag and drop-ul*/
 
 class MyCellRenderer extends JPanel implements ListCellRenderer {
 

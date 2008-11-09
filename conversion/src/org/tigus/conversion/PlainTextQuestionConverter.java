@@ -38,7 +38,7 @@ public class PlainTextQuestionConverter {
         q = new Question();
     }
 
-    public void parseFile() {
+    public void parseFile() throws Exception{
         FileReader inputReader;
 
         try {
@@ -111,6 +111,8 @@ public class PlainTextQuestionConverter {
                      * debug purposes: (uncomment next line)
                      */
                     // printQuestion();
+                    System.out.println("trec la urmatoarea intrebare!");
+                    
                     qSet.add(q);
                     q = new Question();
                 }
@@ -128,12 +130,15 @@ public class PlainTextQuestionConverter {
                 }
             }
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (FileNotFoundException e) {            
+          //  e.printStackTrace();
+            throw e;
         } catch (IOException e) {
-            e.printStackTrace();
+          //  e.printStackTrace();
+            throw e;
         } catch (Exception e) {
-            e.printStackTrace();
+          //  e.printStackTrace();
+            throw e;
         }
 
     }

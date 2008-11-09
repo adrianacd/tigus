@@ -1,6 +1,8 @@
 package org.tigus.app.editor;
 
 import org.tigus.core.*;
+import org.tigus.conversion.*;
+
 import java.io.*;
 import java.util.Vector;
 
@@ -60,7 +62,7 @@ public class MainWindow implements ActionListener {
         /* add components : menu, toolbar, tooltips, panel  */
         initComponents();
         
-        
+      
         author = getAuthor();
         untitled = true;
         unsaved = false;
@@ -92,19 +94,18 @@ public class MainWindow implements ActionListener {
         int i;
         
         String []menuItemsNames = {"New", "Open...", "Save", "Save As...",
-                                    "Import...", "Include", "Quit", 
-                                    "Create", "Delete", "Review", "Move"};
+                                    "Import...", "Include", "Quit", "Preferences"
+                                    };
         String []iconNames = {"images/newQS.png", "images/open.png", "images/save.png",
-                                "images/saveas.png", "", "", "images/exit.png",
-                                "images/create.png", "images/delete.png", "images/edit.png",
-                                "images/switch.png"};                               
+                               "images/saveas.png", "images/switch.png","", "images/exit.png",
+                               "images/configure.png"};                               
         
         /* create menus */
         
-        menuItems = new JMenuItem[12];
+        menuItems = new JMenuItem[8];
         // menuItems 0->6  for fileMenu, menuItems 7->10 for questionMenu
         
-        for (i = 0; i < 11; i++) {
+        for (i = 0; i < 8; i++) {
             /* initialize the JMenuItems components with text and icons */
             menuItems[i] = new JMenuItem(menuItemsNames[i], new ImageIcon(iconNames[i]));   
             
@@ -119,13 +120,8 @@ public class MainWindow implements ActionListener {
         menuItems[0].setToolTipText("Create a new question set");
         menuItems[1].setToolTipText("Select a question set and load its content");
         menuItems[2].setToolTipText("Save the changes made to a question set");        
-        
-        menuItems[7].setToolTipText("Write a new question and save it to a question set");
-        menuItems[8].setToolTipText("Delete a question");
-        menuItems[9].setToolTipText("Review/edit a question and save the changes");
-        
-        menuItems[10].setToolTipText("Move questions between question sets");
-        
+        menuItems[4].setToolTipText("Import question from a \".txt\" file");
+          
         /*set menu items' accelerators and mnemonics */
         
         menuItems[0].setAccelerator(KeyStroke.getKeyStroke(
@@ -152,22 +148,16 @@ public class MainWindow implements ActionListener {
         fileMenu.addSeparator();
         fileMenu.add(menuItems[6]);
         
-        for (i = 7; i < 11; i++) {
-            questionMenu.add(menuItems[i]);
-            
-            //disable question menu items 
-            //These items are enabled only when a question set is loaded or created
-            menuItems[i].setEnabled(false);
-        }
-        JMenuItem preferencesMenuItem = new JMenuItem("Preferences");
-        preferencesMenuItem.addActionListener(this);
+       
+       // JMenuItem preferencesMenuItem = new JMenuItem("Preferences",
+       //                                         new ImageIcon(iconNames[6]));
+      //  preferencesMenuItem.addActionListener(this);
         toolsMenu = new JMenu("Tools");
         toolsMenu.setMnemonic(KeyEvent.VK_T);
-        toolsMenu.add(preferencesMenuItem);
+        toolsMenu.add(menuItems[7]);
         
         menuBar = new JMenuBar();
-        menuBar.add(fileMenu);
-       // menuBar.add(questionMenu);
+        menuBar.add(fileMenu);      
         menuBar.add(toolsMenu);
         
         frame.setJMenuBar(menuBar);   
@@ -186,9 +176,9 @@ public class MainWindow implements ActionListener {
         
         toolBar.addSeparator();
         
-        for (i = 3; i < 7; i++) {
-            toolBarButtons[i] = new JButton(new ImageIcon(iconNames[i+4]));
-            toolBarButtons[i].setActionCommand(menuItemsNames[i+4]);
+        for (i = 4; i < 5; i++) {
+            toolBarButtons[i] = new JButton(new ImageIcon(iconNames[i]));
+            toolBarButtons[i].setActionCommand(menuItemsNames[i]);
             toolBarButtons[i].addActionListener(this);
             toolBar.add(toolBarButtons[i]);
         }
@@ -286,7 +276,11 @@ public class MainWindow implements ActionListener {
                 qs.loadFromFile(path);
                
             }catch(Exception ex){
+                JOptionPane.showMessageDialog(frame.getContentPane(),
+                        "Failed to open file. Invalid format", 
+                            "error", JOptionPane.ERROR_MESSAGE);
                 System.out.println(ex.toString());
+                return;
             }
             
             if (empty == false) {
@@ -344,10 +338,53 @@ public class MainWindow implements ActionListener {
             return;
         }
         
-        if (command.equals("Preferences")) {                
+        if (command.equals("Import...")) {
             
-             preferencesWindow = new PreferencesWindow(qsTab);
-          
+            JFileChooser fileChooser = new JFileChooser();
+            int action = fileChooser.showOpenDialog(frame);
+            
+            if (action != JFileChooser.APPROVE_OPTION)
+                return;
+            File file = fileChooser.getSelectedFile();
+            String path = file.getPath();
+            String qsName = file.getName();   
+            
+           
+            PlainTextQuestionConverter plain;
+
+            plain = new PlainTextQuestionConverter(path);
+            try{
+                plain.parseFile();
+            } catch (Exception ex) {                
+                JOptionPane.showMessageDialog(frame.getContentPane(),
+                        "Failed to import file. Invalid format", 
+                            "error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+                return;
+            }
+            qs = plain.getQuestionSet();
+            if (empty == false) {
+                MainWindow newWindow = new MainWindow();
+                newWindow.showQuestionSet(qs, qsName, path);
+                return;
+            }
+            
+            showQuestionSet(qs, qsName, path);
+            
+            
+            // the imported QuestionSet it's not saved, and its name can be changed when
+            // it is saved in xml format
+            untitled = true;
+            unsaved = true;
+            
+            return;            
+            
+            
+        }
+        
+        if (command.equals("Preferences")) { 
+            
+            preferencesWindow = new PreferencesWindow(qsTab);       
         }
         
         
@@ -397,11 +434,7 @@ public class MainWindow implements ActionListener {
            therefore, the PreferencesWindow object needs to be notified */
         if(preferencesWindow != null) 
             preferencesWindow.setQuestionTab(qsTab);
-        
-        menuItems[7].setEnabled(true);
-        menuItems[8].setEnabled(true);
-        menuItems[9].setEnabled(true);
-        
+               
         empty = false;
         untitled = false;
         

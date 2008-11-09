@@ -25,6 +25,8 @@
 		<fileset dir="${bin}" />
 		<fileset dir="../common/bin" />		
 		<fileset dir="../conversion/bin" />
+		<zipfileset src="../common/lib/xstream-1.3.jar" />
+
 		<manifest>
      			<attribute name="Main-Class" value="org.tigus.app.editor.QuestionEditor"/>
 			<attribute name="Class-Path" value="../common/lib/xstream-1.3.jar"/>
